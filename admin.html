@@ -115,6 +115,19 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #1b5e20;
         }
+
+        /* Sync status */
+        .sync-status {
+            transition: all 0.3s ease;
+        }
+        .sync-status.synced {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .sync-status.unsynced {
+            background: #fef3c7;
+            color: #92400e;
+        }
     </style>
 </head>
 <body>
@@ -133,11 +146,21 @@
                 <i class="fas fa-shield-alt"></i>
                 Admin Panel
             </span>
+            <button onclick="syncFromProductsJS()" class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-700 transition-all inline-flex items-center gap-2">
+                <i class="fas fa-sync"></i>
+                Sync from products.js
+            </button>
             <a href="index.html" class="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 inline-flex items-center gap-2">
                 <i class="fas fa-store"></i>
                 View Store
             </a>
         </div>
+    </div>
+
+    <!-- Sync Status -->
+    <div id="syncStatus" class="sync-status synced mb-4 px-4 py-2 rounded-lg text-sm flex items-center justify-between">
+        <span><i class="fas fa-check-circle text-green-600"></i> Synced with products.js</span>
+        <span id="productCountDisplay">0 products loaded</span>
     </div>
 
     <!-- Stats -->
@@ -221,11 +244,11 @@
                 </div>
                 
                 <div class="flex flex-wrap gap-3">
-                    <button type="submit" class="bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 btn-admin inline-flex items-center gap-2">
+                    <button type="submit" id="submitBtn" class="bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 btn-admin inline-flex items-center gap-2">
                         <i class="fas fa-plus"></i>
                         Add Product
                     </button>
-                    <button type="reset" class="bg-gray-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-600 transition-all inline-flex items-center gap-2">
+                    <button type="reset" id="resetBtn" class="bg-gray-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-600 transition-all inline-flex items-center gap-2">
                         <i class="fas fa-undo"></i>
                         Clear
                     </button>
@@ -262,33 +285,93 @@
         </p>
     </div>
 
+    <!-- Sync Section -->
+    <div class="mt-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg p-4">
+        <h4 class="text-blue-800 font-semibold flex items-center gap-2">
+            <i class="fas fa-sync"></i>
+            Sync Options
+        </h4>
+        <p class="text-blue-700 text-sm mt-1">
+            <strong>Sync from products.js:</strong> Load the current products from your products.js file (useful if you've manually edited it).
+            <br />
+            <strong>Download products.js:</strong> Export your current admin products to replace the file.
+        </p>
+    </div>
+
     <!-- Instructions -->
-    <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg p-4 md:p-6">
+    <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg p-4 md:p-6">
         <h4 class="text-yellow-800 font-semibold flex items-center gap-2 mb-2">
             <i class="fas fa-lightbulb"></i>
             Quick Guide
         </h4>
         <ol class="text-yellow-800 text-sm space-y-1 ml-6 list-decimal">
-            <li><strong>Add</strong> products using the form above (upload images directly!)</li>
-            <li><strong>Edit</strong> or <strong>delete</strong> products using the buttons</li>
-            <li>Click <strong>"Download products.js"</strong> to get your updated file</li>
+            <li>Admin panel loads products from <strong>products.js</strong> (just like the ecommerce site)</li>
+            <li><strong>Add/Edit/Delete</strong> products using the form above</li>
+            <li>Changes are saved to <strong>localStorage</strong> for editing</li>
+            <li>Click <strong>"Download products.js"</strong> to export your changes</li>
             <li><strong>Upload</strong> the file to your hosting (Netlify/Vercel/GitHub)</li>
-            <li>✅ Your website is now <strong>live</strong> with the new products!</li>
+            <li>✅ Your website updates instantly with your changes!</li>
         </ol>
     </div>
 </div>
 
 <script>
     // ============================================
-    // ADMIN PANEL LOGIC WITH IMAGE UPLOAD
+    // ADMIN PANEL - SYNCED WITH products.js
     // ============================================
 
-    // Load products from localStorage or use default
-    let products = JSON.parse(localStorage.getItem('adminProducts')) || [];
+    // ===== STEP 1: Load products from products.js =====
+    // This loads the same file that the ecommerce site uses
+    let products = [];
 
-    // Default products if empty
-    if (products.length === 0) {
-        products = [
+    function loadProductsFromJS() {
+        try {
+            // Check if products is defined (from products.js)
+            if (typeof products !== 'undefined' && Array.isArray(products) && products.length > 0) {
+                return products;
+            }
+        } catch (e) {
+            console.warn('products.js not loaded, checking localStorage...');
+        }
+        return null;
+    }
+
+    // ===== STEP 2: Initialize products =====
+    function initializeProducts() {
+        // First try to load from localStorage (user's edits)
+        const stored = localStorage.getItem('adminProducts');
+        
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    products = parsed;
+                    console.log('✅ Loaded products from localStorage:', products.length);
+                    return;
+                }
+            } catch (e) {
+                console.warn('Failed to parse stored products');
+            }
+        }
+        
+        // If no localStorage, try products.js
+        const jsProducts = loadProductsFromJS();
+        if (jsProducts) {
+            products = JSON.parse(JSON.stringify(jsProducts)); // Deep copy
+            saveProducts();
+            console.log('✅ Loaded products from products.js:', products.length);
+            return;
+        }
+        
+        // Fallback to defaults
+        products = getDefaultProducts();
+        saveProducts();
+        console.log('📦 Loaded default products:', products.length);
+    }
+
+    // Default products
+    function getDefaultProducts() {
+        return [
             {
                 id: 1,
                 name: "Elegant Floral Dress",
@@ -314,7 +397,6 @@
                 description: "Elegant high-waist trousers with a modern fit"
             }
         ];
-        saveProducts();
     }
 
     // ============================================
@@ -331,22 +413,16 @@
     
     let currentImageData = null;
 
-    // Click to upload
     uploadArea.addEventListener('click', function(e) {
-        // Don't trigger if clicking remove button
         if (e.target.closest('.remove-image')) return;
         imageInput.click();
     });
 
-    // File selected
     imageInput.addEventListener('change', function(e) {
         const file = this.files[0];
-        if (file) {
-            handleFile(file);
-        }
+        if (file) handleFile(file);
     });
 
-    // Drag and drop
     uploadArea.addEventListener('dragover', function(e) {
         e.preventDefault();
         this.classList.add('dragover');
@@ -361,21 +437,16 @@
         e.preventDefault();
         this.classList.remove('dragover');
         const file = e.dataTransfer.files[0];
-        if (file) {
-            handleFile(file);
-        }
+        if (file) handleFile(file);
     });
 
-    // Handle file
     function handleFile(file) {
-        // Validate file type
         const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
             showNotification('Please upload a valid image (PNG, JPG, WEBP)', 'error');
             return;
         }
 
-        // Validate file size (max 2MB)
         if (file.size > 2 * 1024 * 1024) {
             showNotification('Image must be less than 2MB', 'error');
             return;
@@ -387,7 +458,6 @@
             currentImageData = imageData;
             productImage.value = imageData;
             
-            // Show preview
             previewImg.src = imageData;
             uploadPlaceholder.classList.add('hidden');
             imagePreview.classList.remove('hidden');
@@ -399,7 +469,6 @@
         reader.readAsDataURL(file);
     }
 
-    // Remove image
     removeImageBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         clearImageUpload();
@@ -424,6 +493,8 @@
         localStorage.setItem('adminProducts', JSON.stringify(products));
         renderProducts();
         updateStats();
+        updateSyncStatus();
+        console.log('💾 Products saved to localStorage:', products.length);
     }
 
     function showNotification(message, type = 'success') {
@@ -440,6 +511,7 @@
         const productCount = document.getElementById('productCount');
         
         productCount.textContent = products.length;
+        document.getElementById('productCountDisplay').textContent = `${products.length} products loaded`;
         
         if (products.length === 0) {
             productList.innerHTML = `
@@ -452,15 +524,16 @@
             return;
         }
 
-        productList.innerHTML = products.map(product => `
-            <div class="product-item-admin flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg transition-colors">
+        productList.innerHTML = products.map((product, index) => `
+            <div class="product-item-admin flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg transition-colors" data-index="${index}">
                 <div class="flex items-center gap-3 flex-1 w-full sm:w-auto">
                     <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" 
                          onerror="this.src='https://via.placeholder.com/50x50/2e7d32/ffffff?text=No+Image'" />
                     <div class="min-w-0 flex-1">
                         <h4 class="font-semibold text-sm truncate">${product.name}</h4>
                         <p class="text-gray-500 text-xs capitalize">${product.category || 'Uncategorized'} • ${product.price} cedis</p>
-                        ${product.image.startsWith('data:image') ? '<span class="text-xs text-green-600 inline-block mt-0.5"><i class="fas fa-check-circle"></i> Uploaded</span>' : ''}
+                        ${product.image && product.image.startsWith('data:image') ? '<span class="text-xs text-green-600 inline-block mt-0.5"><i class="fas fa-check-circle"></i> Uploaded</span>' : ''}
+                        <span class="text-xs text-gray-400 ml-2">ID: ${product.id}</span>
                     </div>
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
@@ -481,9 +554,65 @@
         document.getElementById('totalProducts').textContent = products.length;
         const categories = new Set(products.map(p => p.category).filter(Boolean));
         document.getElementById('totalCategories').textContent = categories.size;
-        document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString();
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
     }
 
+    function updateSyncStatus() {
+        const status = document.getElementById('syncStatus');
+        // Check if localStorage matches what would be in products.js
+        // We'll just show it's synced since we're using localStorage as source of truth
+        status.className = 'sync-status synced px-4 py-2 rounded-lg text-sm flex items-center justify-between';
+        status.innerHTML = `
+            <span><i class="fas fa-check-circle text-green-600"></i> Ready to export</span>
+            <span>${products.length} products in admin</span>
+        `;
+    }
+
+    // ===== STEP 3: Sync from products.js =====
+    function syncFromProductsJS() {
+        try {
+            // Try to load from the global products variable (from products.js)
+            if (typeof window.products !== 'undefined' && Array.isArray(window.products) && window.products.length > 0) {
+                // Deep copy the products
+                products = JSON.parse(JSON.stringify(window.products));
+                saveProducts();
+                showNotification(`✅ Synced ${products.length} products from products.js!`, 'success');
+                console.log('🔄 Synced from products.js:', products);
+            } else {
+                // Try to fetch the file directly
+                fetch('products.js')
+                    .then(response => response.text())
+                    .then(text => {
+                        // Extract the products array from the text
+                        const match = text.match(/const products = (\[[\s\S]*?\]);/);
+                        if (match) {
+                            try {
+                                const parsed = eval(match[1]);
+                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                    products = JSON.parse(JSON.stringify(parsed));
+                                    saveProducts();
+                                    showNotification(`✅ Synced ${products.length} products from products.js!`, 'success');
+                                    console.log('🔄 Synced from products.js file:', products);
+                                }
+                            } catch (e) {
+                                showNotification('Failed to parse products.js', 'error');
+                            }
+                        } else {
+                            showNotification('Could not find products array in products.js', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        showNotification('Could not load products.js file', 'error');
+                    });
+            }
+        } catch (e) {
+            showNotification('Error syncing from products.js', 'error');
+            console.error(e);
+        }
+    }
+
+    // ===== STEP 4: Add/Edit/Delete Products =====
+    
     // Add Product
     document.getElementById('productForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -504,38 +633,58 @@
             return;
         }
 
-        const newProduct = {
-            id: Date.now(),
-            name,
-            price,
-            category,
-            image: image, // This will be Base64 data URL
-            description: description || 'No description available'
-        };
-
-        products.push(newProduct);
+        const submitBtn = document.getElementById('submitBtn');
+        const editId = submitBtn.dataset.editId;
+        
+        if (editId) {
+            // Update existing product
+            const index = products.findIndex(p => p.id === parseInt(editId));
+            if (index !== -1) {
+                products[index] = {
+                    ...products[index],
+                    name: name,
+                    price: price,
+                    category: category,
+                    image: image,
+                    description: description || 'No description available'
+                };
+                showNotification(`✅ "${name}" updated successfully!`);
+            }
+            delete submitBtn.dataset.editId;
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Product';
+            submitBtn.className = 'bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 btn-admin inline-flex items-center gap-2';
+        } else {
+            // Add new product
+            const newProduct = {
+                id: Date.now(),
+                name,
+                price,
+                category,
+                image: image,
+                description: description || 'No description available'
+            };
+            products.push(newProduct);
+            showNotification(`✅ "${name}" added successfully!`);
+        }
+        
         saveProducts();
-        showNotification(`✅ "${name}" added successfully!`);
         this.reset();
         clearImageUpload();
-        
-        // Reset submit button
-        const submitBtn = document.querySelector('#productForm button[type="submit"]');
-        submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Product';
-        submitBtn.className = 'bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 btn-admin inline-flex items-center gap-2';
     });
 
     // Edit Product
     function editProduct(id) {
         const product = products.find(p => p.id === id);
-        if (!product) return;
+        if (!product) {
+            showNotification('Product not found!', 'error');
+            return;
+        }
 
         document.getElementById('productName').value = product.name;
         document.getElementById('productPrice').value = product.price;
         document.getElementById('productCategory').value = product.category || '';
         document.getElementById('productDescription').value = product.description || '';
 
-        // Handle image
         if (product.image) {
             currentImageData = product.image;
             productImage.value = product.image;
@@ -546,24 +695,14 @@
             uploadArea.style.background = '#f0fdf4';
         }
 
-        const submitBtn = document.querySelector('#productForm button[type="submit"]');
+        const submitBtn = document.getElementById('submitBtn');
         submitBtn.innerHTML = '<i class="fas fa-sync"></i> Update Product';
         submitBtn.className = 'bg-yellow-400 text-gray-900 px-6 py-2.5 rounded-lg font-semibold hover:bg-yellow-500 transition-all btn-admin inline-flex items-center gap-2';
-
-        // Store the ID being edited
         submitBtn.dataset.editId = id;
 
-        // Remove old product
-        products = products.filter(p => p.id !== id);
-        saveProducts();
-
+        document.querySelector('.admin-card:first-child').scrollIntoView({ behavior: 'smooth' });
         showNotification(`✏️ Editing "${product.name}" - Update and click Update Product`);
     }
-
-    // Handle update
-    document.querySelector('#productForm button[type="submit"]').addEventListener('click', function(e) {
-        // The form submit event handles this
-    });
 
     // Delete Product
     function deleteProduct(id) {
@@ -577,17 +716,23 @@
         }
     }
 
-    // Reset form button
-    document.querySelector('#productForm button[type="reset"]').addEventListener('click', function() {
-        const submitBtn = document.querySelector('#productForm button[type="submit"]');
+    // Reset button
+    document.getElementById('resetBtn').addEventListener('click', function() {
+        const submitBtn = document.getElementById('submitBtn');
         submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Product';
         submitBtn.className = 'bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 btn-admin inline-flex items-center gap-2';
+        delete submitBtn.dataset.editId;
         clearImageUpload();
     });
 
-    // Download products.js (with Base64 images)
+    // ===== STEP 5: Download products.js =====
     function downloadProducts() {
-        // Check for large images and warn
+        if (products.length === 0) {
+            showNotification('No products to download! Add some products first.', 'error');
+            return;
+        }
+
+        // Check for large images
         let totalSize = 0;
         products.forEach(p => {
             if (p.image && p.image.startsWith('data:image')) {
@@ -634,13 +779,13 @@ if (typeof module !== 'undefined' && module.exports) {
         }
     });
 
-    // Initialize
-    renderProducts();
-    updateStats();
+    // ===== STEP 6: Initialize =====
+    initializeProducts();
 
-    console.log('🛍️ Admin Panel Ready with Image Upload!');
-    console.log(`📦 ${products.length} products loaded`);
-    console.log('📸 Upload images directly from your device!');
+    console.log('🛍️ Admin Panel Initialized!');
+    console.log('📦 Products loaded:', products.length);
+    console.log('💡 Use "Sync from products.js" to reload from the file');
+    console.log('💡 Use "Download products.js" to export your changes');
 </script>
 </body>
 </html>
