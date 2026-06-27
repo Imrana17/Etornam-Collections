@@ -31,9 +31,28 @@
             font-family: 'Playfair Display', serif;
         }
         
-        /* Header scroll effect */
+        /* Header - Fixed positioning */
         .header-scrolled {
-            @apply shadow-lg border-b border-gray-200;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        /* Hero section - No gap from header */
+        #home {
+            padding-top: 0;
+            margin-top: 0;
+        }
+        
+        /* Fix for mobile - hero starts right after header */
+        @media (max-width: 768px) {
+            #home {
+                padding-top: 0;
+                min-height: auto;
+                padding-bottom: 3rem;
+            }
+            .hero-mobile-fix {
+                padding-top: 5rem;
+            }
         }
         
         /* Smooth transitions */
@@ -146,9 +165,29 @@
             visibility: visible;
         }
         
-        /* Category active */
-        .category-active {
-            @apply bg-green-700 text-white border-green-700;
+        /* ===== FIXED: Category buttons - No text blur ===== */
+        .category-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        .category-btn:hover {
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+            border-color: #2e7d32 !important;
+        }
+        .category-btn.active {
+            background-color: #2e7d32 !important;
+            color: #ffffff !important;
+            border-color: #2e7d32 !important;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+        .category-btn.active:hover {
+            background-color: #1b5e20 !important;
+            color: #ffffff !important;
+        }
+        .category-btn i {
+            transition: none;
         }
         
         /* Mobile menu */
@@ -157,6 +196,13 @@
             transform: translateY(-100%);
             opacity: 0;
             visibility: hidden;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
         .mobile-menu.active {
             transform: translateY(0);
@@ -190,15 +236,33 @@
             background: #128C7E !important;
             transform: scale(1.02);
         }
+        
+        /* Fix for categories section spacing */
+        .categories-section {
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+        }
+        
+        /* Fix for stats on mobile */
+        @media (max-width: 480px) {
+            .hero-stats-mobile {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .hero-stats-mobile > div {
+                flex: 1 1 30%;
+                min-width: 80px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <!-- ==================== HEADER ==================== -->
-<header id="header" class="fixed top-0 left-0 right-0 bottom-0 z-50 bg-white/95 backdrop-blur-md border-b border-transparent transition-all duration-300">
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-transparent transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
         <!-- Logo -->
-        <a href="#" class="flex items-center gap-2 font-playfair text-xl sm:text-2xl font-bold text-gray-900">
+        <a href="#" class="flex items-center gap-2 font-playfair text-xl sm:text-2xl font-bold text-gray-900 flex-shrink-0">
             <i class="fas fa-crown text-green-700 text-2xl"></i>
             <span>Etornam's</span>
             <span class="text-xs font-normal text-gray-500 tracking-wider hidden sm:inline">Collections</span>
@@ -206,14 +270,14 @@
 
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-8">
-            <a href="#home" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full active">Home</a>
+            <a href="#home" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full">Home</a>
             <a href="#products" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full">Shop</a>
             <a href="#about" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full">About</a>
             <a href="#contact" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full">Contact</a>
         </nav>
 
         <!-- Header Actions -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-shrink-0">
             <button id="cartBtn" class="relative p-2 rounded-full hover:bg-green-50 transition-colors text-gray-700 hover:text-green-700">
                 <i class="fas fa-shopping-bag text-xl"></i>
                 <span id="cartCount" class="absolute -top-1 -right-1 bg-green-700 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
@@ -224,8 +288,8 @@
         </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="md:hidden bg-white border-b border-gray-200 shadow-lg mobile-menu">
+    <!-- Mobile Menu - Now properly positioned -->
+    <div id="mobileMenu" class="md:hidden mobile-menu">
         <div class="px-4 py-4 space-y-3">
             <a href="#home" class="block text-gray-700 hover:text-green-700 font-medium transition-colors py-2 border-b border-gray-100">Home</a>
             <a href="#products" class="block text-gray-700 hover:text-green-700 font-medium transition-colors py-2 border-b border-gray-100">Shop</a>
@@ -235,9 +299,9 @@
     </div>
 </header>
 
-<!-- ==================== HERO SECTION ==================== -->
-<section id="home" class="pt-24 md:pt-28 pb-12 md:pb-16 bg-gradient-to-br from-green-50 to-white min-h-screen flex items-center">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+<!-- ==================== HERO SECTION - FIXED SPACING ==================== -->
+<section id="home" class="bg-gradient-to-br from-green-50 to-white min-h-screen flex items-center hero-mobile-fix">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 w-full pt-16 sm:pt-20 md:pt-24">
         <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <!-- Hero Content -->
             <div>
@@ -265,8 +329,8 @@
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
-                <!-- Stats -->
-                <div class="flex gap-6 md:gap-8 mt-8 pt-6 border-t border-gray-200 animate-fade-in-up-delay-4">
+                <!-- Stats - Fixed mobile layout -->
+                <div class="flex gap-6 md:gap-8 mt-8 pt-6 border-t border-gray-200 animate-fade-in-up-delay-4 hero-stats-mobile">
                     <div>
                         <span class="block text-2xl font-bold text-gray-900 stat-number" data-count="500">0</span>
                         <span class="text-sm text-gray-500">Happy Customers</span>
@@ -287,39 +351,39 @@
                 <div class="rounded-2xl overflow-hidden shadow-2xl">
                     <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600" alt="Fashion Model" class="w-full h-80 md:h-96 object-cover" />
                 </div>
-                <!-- Floating Cards -->
-                <div class="absolute top-8 left-0 md:-left-8 bg-white rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 animate-float">
-                    <i class="fas fa-truck text-green-700 text-xl"></i>
-                    <span class="font-semibold text-sm">Free Delivery</span>
+                <!-- Floating Cards - Responsive positioning -->
+                <div class="absolute top-4 left-2 sm:top-8 sm:left-0 md:-left-8 bg-white rounded-xl shadow-lg px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 sm:gap-3 animate-float">
+                    <i class="fas fa-truck text-green-700 text-base sm:text-xl"></i>
+                    <span class="font-semibold text-xs sm:text-sm">Free Delivery</span>
                 </div>
-                <div class="absolute bottom-8 right-0 md:-right-8 bg-white rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 animate-float-delay">
-                    <i class="fas fa-tshirt text-green-700 text-xl"></i>
-                    <span class="font-semibold text-sm">Premium Quality</span>
+                <div class="absolute bottom-4 right-2 sm:bottom-8 sm:right-0 md:-right-8 bg-white rounded-xl shadow-lg px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 sm:gap-3 animate-float-delay">
+                    <i class="fas fa-tshirt text-green-700 text-base sm:text-xl"></i>
+                    <span class="font-semibold text-xs sm:text-sm">Premium Quality</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ==================== CATEGORIES ==================== -->
-<section class="py-8 bg-white">
+<!-- ==================== CATEGORIES - FIXED SPACING ==================== -->
+<section class="categories-section bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
         <h2 class="font-playfair text-2xl md:text-3xl font-bold mb-6 text-center">Shop by Category</h2>
         <div class="flex flex-wrap gap-2 justify-center" id="categoriesContainer">
-            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 active bg-green-700 text-white" data-category="all">
-                <i class="fas fa-th-large mr-2"></i>All
+            <button class="category-btn active px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-medium border-2 border-transparent transition-all" data-category="all">
+                <i class="fas fa-th-large mr-1 sm:mr-2"></i>All
             </button>
-            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 bg-gray-100 text-gray-700" data-category="dresses">
-                <i class="fas fa-female mr-2"></i>Dresses
+            <button class="category-btn px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-medium border-2 border-gray-200 transition-all bg-white text-gray-700" data-category="dresses">
+                <i class="fas fa-female mr-1 sm:mr-2"></i>Dresses
             </button>
-            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 bg-gray-100 text-gray-700" data-category="tops">
-                <i class="fas fa-tshirt mr-2"></i>Tops
+            <button class="category-btn px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-medium border-2 border-gray-200 transition-all bg-white text-gray-700" data-category="tops">
+                <i class="fas fa-tshirt mr-1 sm:mr-2"></i>Tops
             </button>
-            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 bg-gray-100 text-gray-700" data-category="pants">
-                <i class="fas fa-shoe-prints mr-2"></i>Pants
+            <button class="category-btn px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-medium border-2 border-gray-200 transition-all bg-white text-gray-700" data-category="pants">
+                <i class="fas fa-shoe-prints mr-1 sm:mr-2"></i>Pants
             </button>
-            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 bg-gray-100 text-gray-700" data-category="accessories">
-                <i class="fas fa-gem mr-2"></i>Accessories
+            <button class="category-btn px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-medium border-2 border-gray-200 transition-all bg-white text-gray-700" data-category="accessories">
+                <i class="fas fa-gem mr-1 sm:mr-2"></i>Accessories
             </button>
         </div>
     </div>
@@ -795,15 +859,23 @@
         }, 3000);
     }
 
-    // Category Filter
+    // ===== FIXED: Category Filter with proper classes =====
     document.querySelectorAll('.category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
+            // Remove active from all
             document.querySelectorAll('.category-btn').forEach(b => {
-                b.classList.remove('bg-green-700', 'text-white');
-                b.classList.add('bg-gray-100', 'text-gray-700');
+                b.classList.remove('active');
+                b.style.backgroundColor = '';
+                b.style.color = '';
+                b.style.borderColor = '#e5e7eb';
             });
-            this.classList.remove('bg-gray-100', 'text-gray-700');
-            this.classList.add('bg-green-700', 'text-white');
+            
+            // Add active to clicked
+            this.classList.add('active');
+            this.style.backgroundColor = '#2e7d32';
+            this.style.color = '#ffffff';
+            this.style.borderColor = '#2e7d32';
+            
             currentCategory = this.dataset.category;
             applyFilters();
         });
@@ -866,7 +938,7 @@
 
     checkoutBtn.addEventListener('click', function() {
         const message = cart.getWhatsAppMessage();
-        const whatsappNumber = '233544626869'; // Replace with actual number
+        const whatsappNumber = '233544626869';
         const url = `https://wa.me/${whatsappNumber}?text=${message}`;
         window.open(url, '_blank');
         cart.clear();
