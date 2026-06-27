@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Etornam's Collections</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <style>
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .admin-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .admin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-item-admin {
+            transition: background 0.3s ease;
+        }
+        .product-item-admin:hover {
+            background: #f8f9fa;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-down {
+            animation: slideDown 0.3s ease forwards;
+        }
+        
+        .btn-admin {
+            transition: all 0.3s ease;
+        }
+        .btn-admin:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Image Upload Styles */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #2e7d32;
+            background: #f0fdf4;
+        }
+        .upload-area.dragover {
+            border-color: #2e7d32;
+            background: #dcfce7;
+        }
+        .upload-preview {
+            position: relative;
+            display: inline-block;
+        }
+        .upload-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+        .upload-preview .remove-image {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .upload-preview .remove-image:hover {
+            transform: scale(1.1);
+            background: #dc2626;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e7d32;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1b5e20;
+        }
+    </style>
+</head>
+<body>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+    
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow-md p-4 md:p-6 flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <div class="flex items-center gap-3 font-playfair text-2xl font-bold text-gray-900">
+            <i class="fas fa-crown text-green-700"></i>
+            <span>Etornam's</span>
+            <span class="text-sm font-normal text-gray-500 tracking-wider">Collections</span>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap justify-center">
+            <span class="bg-green-700 text-white px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2">
+                <i class="fas fa-shield-alt"></i>
+                Admin Panel
+            </span>
+            <a href="index.html" class="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 inline-flex items-center gap-2">
+                <i class="fas fa-store"></i>
+                View Store
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-xl shadow-sm p-4 md:p-6 text-center">
+            <div class="text-3xl text-green-700 opacity-30 mb-2"><i class="fas fa-box"></i></div>
+            <div class="text-2xl md:text-3xl font-bold text-green-700" id="totalProducts">0</div>
+            <div class="text-gray-500 text-sm">Total Products</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-4 md:p-6 text-center">
+            <div class="text-3xl text-green-700 opacity-30 mb-2"><i class="fas fa-tag"></i></div>
+            <div class="text-2xl md:text-3xl font-bold text-green-700" id="totalCategories">0</div>
+            <div class="text-gray-500 text-sm">Categories</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-4 md:p-6 text-center col-span-2 md:col-span-1">
+            <div class="text-3xl text-green-700 opacity-30 mb-2"><i class="fas fa-clock"></i></div>
+            <div class="text-base md:text-lg font-bold text-green-700" id="lastUpdated">-</div>
+            <div class="text-gray-500 text-sm">Last Updated</div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notificationAdmin" class="hidden mb-4 px-4 py-3 rounded-lg animate-slide-down"></div>
+
+    <!-- Main Grid -->
+    <div class="grid md:grid-cols-2 gap-6">
+        
+        <!-- Add Product Form -->
+        <div class="bg-white rounded-2xl shadow-md p-6 admin-card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <i class="fas fa-plus-circle text-green-700"></i>
+                Add New Product
+            </h2>
+            <form id="productForm">
+                <div class="mb-4">
+                    <label class="block font-semibold text-sm mb-1.5">Product Name *</label>
+                    <input type="text" id="productName" placeholder="e.g., Summer Maxi Dress" required class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-green-700 outline-none transition-colors" />
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="block font-semibold text-sm mb-1.5">Price (cedis) *</label>
+                        <input type="number" id="productPrice" placeholder="e.g., 120" required class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-green-700 outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-sm mb-1.5">Category *</label>
+                        <select id="productCategory" required class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-green-700 outline-none transition-colors bg-white">
+                            <option value="">Select Category</option>
+                            <option value="dresses">Dresses</option>
+                            <option value="tops">Tops</option>
+                            <option value="pants">Pants</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Image Upload Section -->
+                <div class="mb-4">
+                    <label class="block font-semibold text-sm mb-1.5">Product Image *</label>
+                    <div id="uploadArea" class="upload-area rounded-lg p-6 text-center">
+                        <input type="file" id="imageInput" accept="image/*" class="hidden" />
+                        <div id="uploadPlaceholder">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-500 text-sm">Click or drag & drop to upload</p>
+                            <p class="text-gray-400 text-xs mt-1">PNG, JPG, WEBP (Max 2MB)</p>
+                        </div>
+                        <div id="imagePreview" class="hidden upload-preview">
+                            <img id="previewImg" src="" alt="Preview" />
+                            <button type="button" id="removeImageBtn" class="remove-image">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="productImage" required />
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block font-semibold text-sm mb-1.5">Description</label>
+                    <textarea id="productDescription" placeholder="Describe your product..." rows="3" class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-green-700 outline-none transition-colors resize-y"></textarea>
+                </div>
+                
+                <div class="flex flex-wrap gap-3">
+                    <button type="submit" class="bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 btn-admin inline-flex items-center gap-2">
+                        <i class="fas fa-plus"></i>
+                        Add Product
+                    </button>
+                    <button type="reset" class="bg-gray-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-600 transition-all inline-flex items-center gap-2">
+                        <i class="fas fa-undo"></i>
+                        Clear
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Product List -->
+        <div class="bg-white rounded-2xl shadow-md p-6 admin-card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <i class="fas fa-list text-green-700"></i>
+                Product List
+                <span class="text-sm font-normal text-gray-500 ml-2">(<span id="productCount">0</span>)</span>
+            </h2>
+            <div id="productList" class="max-h-[500px] overflow-y-auto">
+                <!-- Rendered by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Section -->
+    <div class="mt-6 bg-gradient-to-r from-green-700 to-green-800 rounded-2xl p-6 md:p-8 text-center text-white">
+        <h3 class="text-2xl font-bold mb-2"><i class="fas fa-download mr-2"></i>Update Your Website</h3>
+        <p class="opacity-90 mb-4 max-w-md mx-auto">
+            Download the products.js file and upload it to your hosting provider. Your website will update instantly!
+        </p>
+        <button onclick="downloadProducts()" class="bg-white text-green-700 px-8 py-3 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-lg inline-flex items-center gap-3">
+            <i class="fas fa-file-code"></i>
+            Download products.js
+        </button>
+        <p class="text-xs opacity-75 mt-3">
+            <i class="fas fa-info-circle"></i>
+            Contains all your products with images (Base64 encoded), prices, and descriptions
+        </p>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg p-4 md:p-6">
+        <h4 class="text-yellow-800 font-semibold flex items-center gap-2 mb-2">
+            <i class="fas fa-lightbulb"></i>
+            Quick Guide
+        </h4>
+        <ol class="text-yellow-800 text-sm space-y-1 ml-6 list-decimal">
+            <li><strong>Add</strong> products using the form above (upload images directly!)</li>
+            <li><strong>Edit</strong> or <strong>delete</strong> products using the buttons</li>
+            <li>Click <strong>"Download products.js"</strong> to get your updated file</li>
+            <li><strong>Upload</strong> the file to your hosting (Netlify/Vercel/GitHub)</li>
+            <li>✅ Your website is now <strong>live</strong> with the new products!</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // ADMIN PANEL LOGIC WITH IMAGE UPLOAD
+    // ============================================
+
+    // Load products from localStorage or use default
+    let products = JSON.parse(localStorage.getItem('adminProducts')) || [];
+
+    // Default products if empty
+    if (products.length === 0) {
+        products = [
+            {
+                id: 1,
+                name: "Elegant Floral Dress",
+                price: 120,
+                image: "https://images.unsplash.com/photo-1612336307429-8a898d10e223?w=300",
+                category: "dresses",
+                description: "Beautiful floral print dress perfect for summer"
+            },
+            {
+                id: 2,
+                name: "Classic White Blouse",
+                price: 85,
+                image: "https://images.unsplash.com/photo-1603252109303-2751441dd157?w=300",
+                category: "tops",
+                description: "Versatile white blouse for any occasion"
+            },
+            {
+                id: 3,
+                name: "High-Waist Trousers",
+                price: 150,
+                image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300",
+                category: "pants",
+                description: "Elegant high-waist trousers with a modern fit"
+            }
+        ];
+        saveProducts();
+    }
+
+    // ============================================
+    // IMAGE UPLOAD HANDLING
+    // ============================================
+    
+    const uploadArea = document.getElementById('uploadArea');
+    const imageInput = document.getElementById('imageInput');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+    const productImage = document.getElementById('productImage');
+    
+    let currentImageData = null;
+
+    // Click to upload
+    uploadArea.addEventListener('click', function(e) {
+        // Don't trigger if clicking remove button
+        if (e.target.closest('.remove-image')) return;
+        imageInput.click();
+    });
+
+    // File selected
+    imageInput.addEventListener('change', function(e) {
+        const file = this.files[0];
+        if (file) {
+            handleFile(file);
+        }
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            handleFile(file);
+        }
+    });
+
+    // Handle file
+    function handleFile(file) {
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+        if (!validTypes.includes(file.type)) {
+            showNotification('Please upload a valid image (PNG, JPG, WEBP)', 'error');
+            return;
+        }
+
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            showNotification('Image must be less than 2MB', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imageData = e.target.result;
+            currentImageData = imageData;
+            productImage.value = imageData;
+            
+            // Show preview
+            previewImg.src = imageData;
+            uploadPlaceholder.classList.add('hidden');
+            imagePreview.classList.remove('hidden');
+            uploadArea.style.borderColor = '#2e7d32';
+            uploadArea.style.background = '#f0fdf4';
+            
+            showNotification('Image uploaded successfully! 📸', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Remove image
+    removeImageBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        clearImageUpload();
+    });
+
+    function clearImageUpload() {
+        currentImageData = null;
+        productImage.value = '';
+        previewImg.src = '';
+        uploadPlaceholder.classList.remove('hidden');
+        imagePreview.classList.add('hidden');
+        uploadArea.style.borderColor = '#d1d5db';
+        uploadArea.style.background = 'transparent';
+        imageInput.value = '';
+    }
+
+    // ============================================
+    // PRODUCT MANAGEMENT
+    // ============================================
+
+    function saveProducts() {
+        localStorage.setItem('adminProducts', JSON.stringify(products));
+        renderProducts();
+        updateStats();
+    }
+
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notificationAdmin');
+        notification.textContent = message;
+        notification.className = `block px-4 py-3 rounded-lg animate-slide-down ${type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`;
+        setTimeout(() => {
+            notification.className = 'hidden';
+        }, 4000);
+    }
+
+    function renderProducts() {
+        const productList = document.getElementById('productList');
+        const productCount = document.getElementById('productCount');
+        
+        productCount.textContent = products.length;
+        
+        if (products.length === 0) {
+            productList.innerHTML = `
+                <div class="text-center py-12 text-gray-500">
+                    <i class="fas fa-box-open text-4xl opacity-30 mb-3"></i>
+                    <h4 class="font-semibold">No products yet</h4>
+                    <p class="text-sm">Add your first product above!</p>
+                </div>
+            `;
+            return;
+        }
+
+        productList.innerHTML = products.map(product => `
+            <div class="product-item-admin flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg transition-colors">
+                <div class="flex items-center gap-3 flex-1 w-full sm:w-auto">
+                    <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" 
+                         onerror="this.src='https://via.placeholder.com/50x50/2e7d32/ffffff?text=No+Image'" />
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-semibold text-sm truncate">${product.name}</h4>
+                        <p class="text-gray-500 text-xs capitalize">${product.category || 'Uncategorized'} • ${product.price} cedis</p>
+                        ${product.image.startsWith('data:image') ? '<span class="text-xs text-green-600 inline-block mt-0.5"><i class="fas fa-check-circle"></i> Uploaded</span>' : ''}
+                    </div>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="editProduct(${product.id})" class="bg-yellow-400 text-gray-900 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-yellow-500 transition-colors inline-flex items-center gap-1">
+                        <i class="fas fa-edit"></i>
+                        Edit
+                    </button>
+                    <button onclick="deleteProduct(${product.id})" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-600 transition-colors inline-flex items-center gap-1">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateStats() {
+        document.getElementById('totalProducts').textContent = products.length;
+        const categories = new Set(products.map(p => p.category).filter(Boolean));
+        document.getElementById('totalCategories').textContent = categories.size;
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString();
+    }
+
+    // Add Product
+    document.getElementById('productForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('productName').value.trim();
+        const price = parseFloat(document.getElementById('productPrice').value);
+        const category = document.getElementById('productCategory').value;
+        const image = document.getElementById('productImage').value.trim();
+        const description = document.getElementById('productDescription').value.trim();
+
+        if (!name || !price || !category) {
+            showNotification('Please fill in all required fields!', 'error');
+            return;
+        }
+
+        if (!image) {
+            showNotification('Please upload a product image!', 'error');
+            return;
+        }
+
+        const newProduct = {
+            id: Date.now(),
+            name,
+            price,
+            category,
+            image: image, // This will be Base64 data URL
+            description: description || 'No description available'
+        };
+
+        products.push(newProduct);
+        saveProducts();
+        showNotification(`✅ "${name}" added successfully!`);
+        this.reset();
+        clearImageUpload();
+        
+        // Reset submit button
+        const submitBtn = document.querySelector('#productForm button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Product';
+        submitBtn.className = 'bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 btn-admin inline-flex items-center gap-2';
+    });
+
+    // Edit Product
+    function editProduct(id) {
+        const product = products.find(p => p.id === id);
+        if (!product) return;
+
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productCategory').value = product.category || '';
+        document.getElementById('productDescription').value = product.description || '';
+
+        // Handle image
+        if (product.image) {
+            currentImageData = product.image;
+            productImage.value = product.image;
+            previewImg.src = product.image;
+            uploadPlaceholder.classList.add('hidden');
+            imagePreview.classList.remove('hidden');
+            uploadArea.style.borderColor = '#2e7d32';
+            uploadArea.style.background = '#f0fdf4';
+        }
+
+        const submitBtn = document.querySelector('#productForm button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-sync"></i> Update Product';
+        submitBtn.className = 'bg-yellow-400 text-gray-900 px-6 py-2.5 rounded-lg font-semibold hover:bg-yellow-500 transition-all btn-admin inline-flex items-center gap-2';
+
+        // Store the ID being edited
+        submitBtn.dataset.editId = id;
+
+        // Remove old product
+        products = products.filter(p => p.id !== id);
+        saveProducts();
+
+        showNotification(`✏️ Editing "${product.name}" - Update and click Update Product`);
+    }
+
+    // Handle update
+    document.querySelector('#productForm button[type="submit"]').addEventListener('click', function(e) {
+        // The form submit event handles this
+    });
+
+    // Delete Product
+    function deleteProduct(id) {
+        const product = products.find(p => p.id === id);
+        if (!product) return;
+        
+        if (confirm(`Are you sure you want to delete "${product.name}"?`)) {
+            products = products.filter(p => p.id !== id);
+            saveProducts();
+            showNotification(`🗑️ "${product.name}" deleted`);
+        }
+    }
+
+    // Reset form button
+    document.querySelector('#productForm button[type="reset"]').addEventListener('click', function() {
+        const submitBtn = document.querySelector('#productForm button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Product';
+        submitBtn.className = 'bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 btn-admin inline-flex items-center gap-2';
+        clearImageUpload();
+    });
+
+    // Download products.js (with Base64 images)
+    function downloadProducts() {
+        // Check for large images and warn
+        let totalSize = 0;
+        products.forEach(p => {
+            if (p.image && p.image.startsWith('data:image')) {
+                totalSize += p.image.length;
+            }
+        });
+        
+        if (totalSize > 5 * 1024 * 1024) {
+            if (!confirm('Your images are quite large (over 5MB total). This might make the products.js file slow to load. Consider compressing your images. Continue anyway?')) {
+                return;
+            }
+        }
+
+        const jsContent = `// Auto-generated by Etornam's Collections Admin Panel
+// Last updated: ${new Date().toLocaleString()}
+// Total products: ${products.length}
+// Images are embedded as Base64 (no external URLs needed!)
+
+const products = ${JSON.stringify(products, null, 2)};
+
+// For compatibility
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = products;
+}`;
+
+        const blob = new Blob([jsContent], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'products.js';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showNotification(`📥 Downloaded products.js with ${products.length} products!`);
+    }
+
+    // Keyboard shortcut: Ctrl+S to download
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            downloadProducts();
+        }
+    });
+
+    // Initialize
+    renderProducts();
+    updateStats();
+
+    console.log('🛍️ Admin Panel Ready with Image Upload!');
+    console.log(`📦 ${products.length} products loaded`);
+    console.log('📸 Upload images directly from your device!');
+</script>
+</body>
+</html>

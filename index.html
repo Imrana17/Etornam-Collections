@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Etornam's Collections - Premium Fashion</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <style>
+        /* Custom styles for animations and overrides */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Header scroll effect */
+        .header-scrolled {
+            @apply shadow-lg border-b border-gray-200;
+        }
+        
+        /* Smooth transitions */
+        .transition-smooth {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        .animate-float-delay {
+            animation: float 3s ease-in-out infinite 1.5s;
+        }
+        
+        /* Fade in animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        .animate-fade-in-up-delay-1 {
+            animation: fadeInUp 0.6s ease 0.2s forwards;
+            opacity: 0;
+        }
+        .animate-fade-in-up-delay-2 {
+            animation: fadeInUp 0.6s ease 0.4s forwards;
+            opacity: 0;
+        }
+        .animate-fade-in-up-delay-3 {
+            animation: fadeInUp 0.6s ease 0.6s forwards;
+            opacity: 0;
+        }
+        .animate-fade-in-up-delay-4 {
+            animation: fadeInUp 0.6s ease 0.8s forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-fade-in-right {
+            animation: fadeInRight 0.8s ease forwards;
+        }
+        
+        /* Cart Badge pulse */
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        .animate-pulse-badge {
+            animation: pulse-badge 0.3s ease;
+        }
+        
+        /* Notification toast */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.4s ease forwards;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e7d32;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1b5e20;
+        }
+        
+        /* Product card hover */
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Cart modal */
+        .cart-modal {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%);
+        }
+        .cart-modal.active {
+            transform: translateX(0);
+        }
+        .cart-overlay {
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .cart-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Category active */
+        .category-active {
+            @apply bg-green-700 text-white border-green-700;
+        }
+        
+        /* Mobile menu */
+        .mobile-menu {
+            transition: all 0.3s ease;
+            transform: translateY(-100%);
+            opacity: 0;
+            visibility: hidden;
+        }
+        .mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Scroll to top */
+        .scroll-top {
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        /* Image loading */
+        .product-image {
+            transition: transform 0.6s ease;
+        }
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        
+        /* WhatsApp button hover */
+        .btn-whatsapp:hover {
+            background: #128C7E !important;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-transparent transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-2 font-playfair text-xl sm:text-2xl font-bold text-gray-900">
+            <i class="fas fa-crown text-green-700 text-2xl"></i>
+            <span>Etornam's</span>
+            <span class="text-xs font-normal text-gray-500 tracking-wider hidden sm:inline">Collections</span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="#home" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full active">Home</a>
+            <a href="#products" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full">Shop</a>
+            <a href="#about" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full">About</a>
+            <a href="#contact" class="text-gray-600 hover:text-green-700 font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-green-700 after:transition-all hover:after:w-full">Contact</a>
+        </nav>
+
+        <!-- Header Actions -->
+        <div class="flex items-center gap-3">
+            <button id="cartBtn" class="relative p-2 rounded-full hover:bg-green-50 transition-colors text-gray-700 hover:text-green-700">
+                <i class="fas fa-shopping-bag text-xl"></i>
+                <span id="cartCount" class="absolute -top-1 -right-1 bg-green-700 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+            </button>
+            <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="md:hidden bg-white border-b border-gray-200 shadow-lg mobile-menu">
+        <div class="px-4 py-4 space-y-3">
+            <a href="#home" class="block text-gray-700 hover:text-green-700 font-medium transition-colors py-2 border-b border-gray-100">Home</a>
+            <a href="#products" class="block text-gray-700 hover:text-green-700 font-medium transition-colors py-2 border-b border-gray-100">Shop</a>
+            <a href="#about" class="block text-gray-700 hover:text-green-700 font-medium transition-colors py-2 border-b border-gray-100">About</a>
+            <a href="#contact" class="block text-gray-700 hover:text-green-700 font-medium transition-colors py-2">Contact</a>
+        </div>
+    </div>
+</header>
+
+<!-- ==================== HERO SECTION ==================== -->
+<section id="home" class="pt-24 md:pt-28 pb-12 md:pb-16 bg-gradient-to-br from-green-50 to-white min-h-screen flex items-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <!-- Hero Content -->
+            <div>
+                <div class="inline-flex items-center gap-2 bg-green-700 text-white px-4 py-1.5 rounded-full text-sm font-semibold animate-fade-in-up">
+                    <i class="fas fa-sparkles"></i>
+                    New Collection 2026
+                </div>
+                <h1 class="font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mt-4 leading-tight animate-fade-in-up-delay-1">
+                    Discover Your
+                    <span class="text-green-700 relative inline-block">
+                        Signature Style
+                        <span class="absolute bottom-0 left-0 right-0 h-1/3 bg-green-200/50 -z-10"></span>
+                    </span>
+                </h1>
+                <p class="text-gray-600 text-lg mt-4 max-w-md animate-fade-in-up-delay-2">
+                    Premium fashion curated for the modern individual. Shop the latest trends with Etornam's Collections.
+                </p>
+                <div class="flex flex-wrap gap-3 mt-6 animate-fade-in-up-delay-3">
+                    <a href="#products" class="inline-flex items-center gap-2 bg-green-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 hover:-translate-y-0.5">
+                        <i class="fas fa-shopping-bag"></i>
+                        Shop Now
+                    </a>
+                    <a href="#about" class="inline-flex items-center gap-2 border-2 border-gray-200 text-gray-900 px-6 py-3 rounded-full font-semibold hover:border-green-700 hover:text-green-700 transition-all hover:-translate-y-0.5">
+                        Learn More
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <!-- Stats -->
+                <div class="flex gap-6 md:gap-8 mt-8 pt-6 border-t border-gray-200 animate-fade-in-up-delay-4">
+                    <div>
+                        <span class="block text-2xl font-bold text-gray-900 stat-number" data-count="500">0</span>
+                        <span class="text-sm text-gray-500">Happy Customers</span>
+                    </div>
+                    <div>
+                        <span class="block text-2xl font-bold text-gray-900 stat-number" data-count="150">0</span>
+                        <span class="text-sm text-gray-500">Products</span>
+                    </div>
+                    <div>
+                        <span class="block text-2xl font-bold text-gray-900 stat-number" data-count="4.8">0</span>
+                        <span class="text-sm text-gray-500">Rating</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hero Image -->
+            <div class="relative animate-fade-in-right">
+                <div class="rounded-2xl overflow-hidden shadow-2xl">
+                    <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600" alt="Fashion Model" class="w-full h-80 md:h-96 object-cover" />
+                </div>
+                <!-- Floating Cards -->
+                <div class="absolute top-8 left-0 md:-left-8 bg-white rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 animate-float">
+                    <i class="fas fa-truck text-green-700 text-xl"></i>
+                    <span class="font-semibold text-sm">Free Delivery</span>
+                </div>
+                <div class="absolute bottom-8 right-0 md:-right-8 bg-white rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 animate-float-delay">
+                    <i class="fas fa-tshirt text-green-700 text-xl"></i>
+                    <span class="font-semibold text-sm">Premium Quality</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CATEGORIES ==================== -->
+<section class="py-8 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <h2 class="font-playfair text-2xl md:text-3xl font-bold mb-6 text-center">Shop by Category</h2>
+        <div class="flex flex-wrap gap-2 justify-center" id="categoriesContainer">
+            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 active bg-green-700 text-white" data-category="all">
+                <i class="fas fa-th-large mr-2"></i>All
+            </button>
+            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 bg-gray-100 text-gray-700" data-category="dresses">
+                <i class="fas fa-female mr-2"></i>Dresses
+            </button>
+            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 bg-gray-100 text-gray-700" data-category="tops">
+                <i class="fas fa-tshirt mr-2"></i>Tops
+            </button>
+            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 bg-gray-100 text-gray-700" data-category="pants">
+                <i class="fas fa-shoe-prints mr-2"></i>Pants
+            </button>
+            <button class="category-btn px-5 py-2.5 rounded-full font-medium border-2 border-transparent transition-all hover:bg-green-50 bg-gray-100 text-gray-700" data-category="accessories">
+                <i class="fas fa-gem mr-2"></i>Accessories
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PRODUCTS ==================== -->
+<section id="products" class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <h2 class="font-playfair text-2xl md:text-3xl font-bold relative inline-block after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-16 after:h-1 after:bg-green-700 after:rounded-full">
+                Our Collection
+            </h2>
+            <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-200">
+                <i class="fas fa-sort text-gray-500"></i>
+                <select id="sortSelect" class="border-none bg-transparent font-medium text-sm outline-none">
+                    <option value="default">Default</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="name">Name A-Z</option>
+                </select>
+            </div>
+        </div>
+        <div id="productsContainer" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <!-- Products rendered by JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- ==================== ABOUT ==================== -->
+<section id="about" class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div class="relative rounded-2xl overflow-hidden shadow-2xl group">
+                <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=600" alt="About Us" class="w-full h-80 md:h-96 object-cover" />
+                <div class="absolute inset-0 bg-green-700/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <i class="fas fa-play-circle text-white text-5xl bg-black/50 p-4 rounded-full"></i>
+                </div>
+            </div>
+            <div>
+                <span class="inline-block bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-sm font-semibold mb-4">About Us</span>
+                <h2 class="font-playfair text-2xl md:text-3xl font-bold mb-4">Your Trusted Fashion Destination</h2>
+                <p class="text-gray-600 mb-6">
+                    At Etornam's Collections, we believe fashion is a form of self-expression. 
+                    Our carefully curated pieces are designed to make you feel confident, elegant, 
+                    and uniquely you.
+                </p>
+                <div class="space-y-4 mb-6">
+                    <div class="flex gap-3">
+                        <i class="fas fa-check-circle text-green-700 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-semibold">Premium Quality</h4>
+                            <p class="text-gray-500 text-sm">Handpicked materials and craftsmanship</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <i class="fas fa-check-circle text-green-700 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-semibold">Affordable Luxury</h4>
+                            <p class="text-gray-500 text-sm">High fashion at accessible prices</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <i class="fas fa-check-circle text-green-700 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-semibold">Fast Delivery</h4>
+                            <p class="text-gray-500 text-sm">Quick shipping across the country</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="#contact" class="inline-flex items-center gap-2 bg-green-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 hover:-translate-y-0.5">
+                    Get in Touch
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== NEWSLETTER ==================== -->
+<section class="py-12 bg-gradient-to-r from-green-700 to-green-800 text-white">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center">
+        <i class="fas fa-envelope-open-text text-5xl opacity-80 mb-4"></i>
+        <h2 class="font-playfair text-2xl md:text-3xl font-bold mb-2">Subscribe to Our Newsletter</h2>
+        <p class="opacity-90 mb-6">Get the latest updates on new arrivals and exclusive offers</p>
+        <form id="newsletterForm" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input type="email" placeholder="Enter your email" required class="flex-1 px-4 py-3 rounded-full text-gray-900 outline-none" />
+            <button type="submit" class="bg-gray-900 text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition-all hover:-translate-y-0.5 inline-flex items-center justify-center gap-2">
+                <i class="fas fa-paper-plane"></i>
+                Subscribe
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- ==================== CONTACT ==================== -->
+<section id="contact" class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <h2 class="font-playfair text-2xl md:text-3xl font-bold text-center mb-8 relative inline-block after:content-[''] after:absolute after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2 after:w-16 after:h-1 after:bg-green-700 after:rounded-full block w-full text-center">
+            Contact Us
+        </h2>
+        <div class="grid md:grid-cols-2 gap-6 md:gap-8 mt-8">
+            <!-- Contact Info -->
+            <div class="space-y-4">
+                <div class="bg-white p-5 rounded-xl shadow-md flex gap-4 hover:shadow-lg transition-shadow hover:translate-x-1">
+                    <i class="fas fa-map-marker-alt text-green-700 text-2xl w-12 h-12 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0"></i>
+                    <div>
+                        <h4 class="font-semibold">Address</h4>
+                        <p class="text-gray-600 text-sm">Accra, Ghana</p>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-md flex gap-4 hover:shadow-lg transition-shadow hover:translate-x-1">
+                    <i class="fas fa-phone text-green-700 text-2xl w-12 h-12 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0"></i>
+                    <div>
+                        <h4 class="font-semibold">Phone</h4>
+                        <p class="text-gray-600 text-sm">+233 XX XXX XXXX</p>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-md flex gap-4 hover:shadow-lg transition-shadow hover:translate-x-1">
+                    <i class="fas fa-envelope text-green-700 text-2xl w-12 h-12 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0"></i>
+                    <div>
+                        <h4 class="font-semibold">Email</h4>
+                        <p class="text-gray-600 text-sm">info@etornamscollections.com</p>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-md flex gap-4 hover:shadow-lg transition-shadow hover:translate-x-1">
+                    <i class="fas fa-clock text-green-700 text-2xl w-12 h-12 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0"></i>
+                    <div>
+                        <h4 class="font-semibold">Working Hours</h4>
+                        <p class="text-gray-600 text-sm">Mon - Sat: 9:00 AM - 6:00 PM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <form id="contactForm" class="bg-white p-6 md:p-8 rounded-xl shadow-md">
+                <input type="text" placeholder="Your Name" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg mb-4 focus:border-green-700 outline-none transition-colors" />
+                <input type="email" placeholder="Your Email" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg mb-4 focus:border-green-700 outline-none transition-colors" />
+                <textarea rows="4" placeholder="Your Message" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg mb-4 focus:border-green-700 outline-none transition-colors resize-y"></textarea>
+                <button type="submit" class="w-full bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition-all hover:shadow-lg hover:shadow-green-700/30 hover:-translate-y-0.5 inline-flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="bg-gray-900 text-gray-300 pt-12 pb-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-gray-800">
+            <!-- Brand -->
+            <div>
+                <div class="flex items-center gap-2 font-playfair text-xl font-bold text-white mb-4">
+                    <i class="fas fa-crown text-green-600"></i>
+                    <span>Etornam's</span>
+                    <span class="text-sm font-normal text-gray-400">Collections</span>
+                </div>
+                <p class="text-sm">Premium fashion for the modern individual. Elevate your style with our curated collections.</p>
+                <div class="flex gap-3 mt-4">
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#home" class="hover:text-green-400 transition-colors">Home</a></li>
+                    <li><a href="#products" class="hover:text-green-400 transition-colors">Shop</a></li>
+                    <li><a href="#about" class="hover:text-green-400 transition-colors">About</a></li>
+                    <li><a href="#contact" class="hover:text-green-400 transition-colors">Contact</a></li>
+                </ul>
+            </div>
+            
+            <!-- Customer Service -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">Customer Service</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-green-400 transition-colors">Shipping Policy</a></li>
+                    <li><a href="#" class="hover:text-green-400 transition-colors">Returns & Exchanges</a></li>
+                    <li><a href="#" class="hover:text-green-400 transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-green-400 transition-colors">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            
+            <!-- Newsletter -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">Newsletter</h4>
+                <p class="text-sm mb-4">Subscribe for exclusive offers and updates</p>
+                <form class="flex gap-2">
+                    <input type="email" placeholder="Your email" class="flex-1 px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-600" />
+                    <button type="submit" class="px-4 py-2 bg-green-700 rounded-lg hover:bg-green-800 transition-colors">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Bottom -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 text-sm">
+            <p>&copy; 2026 Etornam's Collections. All rights reserved.</p>
+            <div class="flex gap-4 text-xl opacity-60">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- ==================== CART MODAL ==================== -->
+<div id="cartOverlay" class="fixed inset-0 bg-black/50 z-[999] cart-overlay"></div>
+<div id="cartModal" class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white z-[1000] cart-modal shadow-2xl flex flex-col">
+    <!-- Header -->
+    <div class="flex justify-between items-center p-4 sm:p-6 border-b border-gray-200">
+        <h3 class="text-xl font-bold flex items-center gap-2">
+            <i class="fas fa-shopping-bag text-green-700"></i>
+            Your Cart
+        </h3>
+        <button id="cartClose" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+    
+    <!-- Body -->
+    <div id="cartItems" class="flex-1 overflow-y-auto p-4 sm:p-6">
+        <!-- Rendered by JavaScript -->
+    </div>
+    
+    <!-- Footer -->
+    <div class="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
+        <div class="space-y-2 mb-4">
+            <div class="flex justify-between text-sm">
+                <span>Subtotal</span>
+                <span id="cartTotal" class="font-semibold">0.00 cedis</span>
+            </div>
+            <div class="flex justify-between text-lg font-bold border-t border-gray-200 pt-2">
+                <span>Total</span>
+                <span id="cartGrandTotal" class="text-green-700">0.00 cedis</span>
+            </div>
+        </div>
+        <button id="checkoutBtn" class="w-full bg-[#25D366] text-white py-3 rounded-lg font-bold text-lg flex items-center justify-center gap-2 transition-all hover:bg-[#128C7E] hover:scale-[1.02]">
+            <i class="fab fa-whatsapp"></i>
+            Checkout via WhatsApp
+        </button>
+        <p class="text-xs text-gray-500 text-center mt-2">
+            <i class="fas fa-info-circle"></i>
+            Delivery will be priced based on location
+        </p>
+    </div>
+</div>
+
+<!-- ==================== SCROLL TO TOP ==================== -->
+<button id="scrollTop" class="fixed bottom-6 right-6 w-12 h-12 bg-green-700 text-white rounded-full shadow-lg hover:bg-green-800 transition-all hover:-translate-y-1 scroll-top flex items-center justify-center z-50">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script src="products.js"></script>
+<script src="cart.js"></script>
+<script>
+    // ============================================
+    // MAIN APPLICATION SCRIPT
+    // ============================================
+
+    // DOM Elements
+    const productsContainer = document.getElementById('productsContainer');
+    const cartBtn = document.getElementById('cartBtn');
+    const cartModal = document.getElementById('cartModal');
+    const cartOverlay = document.getElementById('cartOverlay');
+    const cartClose = document.getElementById('cartClose');
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartGrandTotal = document.getElementById('cartGrandTotal');
+    const cartCount = document.getElementById('cartCount');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const scrollTopBtn = document.getElementById('scrollTop');
+    const sortSelect = document.getElementById('sortSelect');
+
+    // Cart Instance
+    const cart = new Cart();
+
+    // Current Category
+    let currentCategory = 'all';
+    let currentProducts = [...products];
+
+    // Render Products
+    function renderProducts(productsToRender = products) {
+        if (!productsContainer) return;
+
+        const filtered = productsToRender.filter(p => 
+            currentCategory === 'all' || p.category === currentCategory
+        );
+
+        if (filtered.length === 0) {
+            productsContainer.innerHTML = `
+                <div class="col-span-full text-center py-12 text-gray-500">
+                    <i class="fas fa-search text-4xl opacity-30 mb-4"></i>
+                    <h3 class="text-xl font-semibold">No products found</h3>
+                    <p>Try adjusting your filters</p>
+                </div>
+            `;
+            return;
+        }
+
+        productsContainer.innerHTML = filtered.map(product => `
+            <div class="product-card bg-white rounded-xl overflow-hidden shadow-md">
+                <div class="relative overflow-hidden h-56 sm:h-64">
+                    <img 
+                        src="${product.image}" 
+                        alt="${product.name}" 
+                        class="product-image w-full h-full object-cover"
+                        loading="lazy"
+                        onerror="this.src='https://via.placeholder.com/300x300/2e7d32/ffffff?text=No+Image'"
+                    />
+                    <button 
+                        onclick="toggleWishlist(${product.id})"
+                        class="absolute top-3 right-3 w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform text-gray-400"
+                    >
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <h3 class="font-semibold text-gray-900 text-sm sm:text-base">${product.name}</h3>
+                    <p class="text-gray-500 text-xs capitalize mt-0.5">${product.category || 'Uncategorized'}</p>
+                    <div class="flex items-center gap-1 text-yellow-500 text-xs mt-1">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span class="text-gray-400 ml-1">(24)</span>
+                    </div>
+                    <p class="text-green-700 font-bold text-lg mt-2">${product.price} cedis</p>
+                    <button 
+                        onclick="addToCart(${product.id})"
+                        class="w-full mt-3 bg-green-700 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-green-800 transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+                    >
+                        <i class="fas fa-plus"></i>
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Add to Cart
+    function addToCart(productId) {
+        cart.addItem(productId);
+        updateCartUI();
+        showNotification('Item added to cart! 🛍️');
+        
+        const badge = document.getElementById('cartCount');
+        badge.classList.add('animate-pulse-badge');
+        setTimeout(() => badge.classList.remove('animate-pulse-badge'), 300);
+    }
+
+    // Update Cart UI
+    function updateCartUI() {
+        const count = cart.getTotalItems();
+        cartCount.textContent = count;
+        cartCount.classList.toggle('hidden', count === 0);
+    }
+
+    // Show Cart
+    function showCart() {
+        const items = cart.items;
+        
+        if (items.length === 0) {
+            cartItems.innerHTML = `
+                <div class="text-center py-12 text-gray-500">
+                    <i class="fas fa-shopping-bag text-4xl opacity-30 mb-4"></i>
+                    <h4 class="font-semibold">Your cart is empty</h4>
+                    <p class="text-sm">Start shopping to add items</p>
+                </div>
+            `;
+            cartTotal.textContent = '0.00 cedis';
+            cartGrandTotal.textContent = '0.00 cedis';
+            checkoutBtn.style.display = 'none';
+        } else {
+            cartItems.innerHTML = items.map(item => `
+                <div class="flex gap-3 py-3 border-b border-gray-100">
+                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-semibold text-sm truncate">${item.name}</h4>
+                        <p class="text-green-700 font-bold text-sm">${item.price} cedis</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" class="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors text-sm">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="font-semibold text-sm w-5 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" class="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors text-sm">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 ml-auto">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="font-bold text-sm text-green-700 flex-shrink-0">
+                        ${item.price * item.quantity} cedis
+                    </div>
+                </div>
+            `).join('');
+            
+            const total = cart.getTotal();
+            cartTotal.textContent = `${total} cedis`;
+            cartGrandTotal.textContent = `${total} cedis`;
+            checkoutBtn.style.display = 'block';
+        }
+        
+        cartModal.classList.add('active');
+        cartOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Update Quantity
+    function updateQuantity(productId, newQty) {
+        if (newQty <= 0) {
+            removeFromCart(productId);
+            return;
+        }
+        cart.updateQuantity(productId, newQty);
+        updateCartUI();
+        showCart();
+    }
+
+    // Remove from Cart
+    function removeFromCart(productId) {
+        cart.removeItem(productId);
+        updateCartUI();
+        showCart();
+        showNotification('Item removed from cart');
+    }
+
+    // Close Cart
+    function closeCart() {
+        cartModal.classList.remove('active');
+        cartOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Toggle Wishlist
+    function toggleWishlist(productId) {
+        const btn = document.querySelector(`.product-card button[onclick="toggleWishlist(${productId})"] i`);
+        btn.classList.toggle('far');
+        btn.classList.toggle('fas');
+        btn.style.color = btn.classList.contains('fas') ? '#e74c3c' : '';
+        showNotification(btn.classList.contains('fas') ? 'Added to wishlist ❤️' : 'Removed from wishlist');
+    }
+
+    // Notification System
+    function showNotification(message) {
+        const existing = document.querySelector('.notification-toast');
+        if (existing) existing.remove();
+
+        const notification = document.createElement('div');
+        notification.className = 'notification-toast fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full font-medium shadow-2xl z-[9999] animate-slide-up whitespace-nowrap';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(-50%) translateY(20px)';
+            notification.style.transition = 'all 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // Category Filter
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.category-btn').forEach(b => {
+                b.classList.remove('bg-green-700', 'text-white');
+                b.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            this.classList.remove('bg-gray-100', 'text-gray-700');
+            this.classList.add('bg-green-700', 'text-white');
+            currentCategory = this.dataset.category;
+            applyFilters();
+        });
+    });
+
+    // Apply Filters & Sort
+    function applyFilters() {
+        let filtered = [...products];
+        
+        if (currentCategory !== 'all') {
+            filtered = filtered.filter(p => p.category === currentCategory);
+        }
+        
+        const sortValue = sortSelect.value;
+        switch (sortValue) {
+            case 'price-low':
+                filtered.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-high':
+                filtered.sort((a, b) => b.price - a.price);
+                break;
+            case 'name':
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+        }
+        
+        renderProducts(filtered);
+    }
+
+    // Hero Stats Animation
+    function animateStats() {
+        const stats = document.querySelectorAll('.stat-number');
+        stats.forEach(stat => {
+            const target = parseFloat(stat.dataset.count);
+            const duration = 2000;
+            const step = target / (duration / 16);
+            let current = 0;
+            
+            const update = () => {
+                current += step;
+                if (current >= target) {
+                    stat.textContent = target;
+                    return;
+                }
+                stat.textContent = Math.floor(current);
+                requestAnimationFrame(update);
+            };
+            update();
+        });
+    }
+
+    // Event Listeners
+    cartBtn.addEventListener('click', showCart);
+    cartClose.addEventListener('click', closeCart);
+    cartOverlay.addEventListener('click', closeCart);
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeCart();
+    });
+
+    checkoutBtn.addEventListener('click', function() {
+        const message = cart.getWhatsAppMessage();
+        const whatsappNumber = '233544626869'; // Replace with actual number
+        const url = `https://wa.me/${whatsappNumber}?text=${message}`;
+        window.open(url, '_blank');
+        cart.clear();
+        updateCartUI();
+        closeCart();
+        showNotification('Order sent via WhatsApp! 📱');
+    });
+
+    sortSelect.addEventListener('change', applyFilters);
+
+    // Mobile Menu
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+        const icon = mobileMenuBtn.querySelector('i');
+        icon.classList.toggle('fa-bars');
+        icon.classList.toggle('fa-times');
+    });
+
+    // Scroll to Top
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+        
+        // Header shadow
+        const header = document.getElementById('header');
+        if (window.scrollY > 100) {
+            header.classList.add('header-scrolled');
+        } else {
+            header.classList.remove('header-scrolled');
+        }
+    });
+
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                mobileMenu.classList.remove('active');
+                const icon = mobileMenuBtn.querySelector('i');
+                icon.classList.add('fa-bars');
+                icon.classList.remove('fa-times');
+            }
+        });
+    });
+
+    // Newsletter Form
+    document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        showNotification('Thank you for subscribing! 📧');
+        this.reset();
+    });
+
+    // Contact Form
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        showNotification('Message sent successfully! We\'ll get back to you soon. 📨');
+        this.reset();
+    });
+
+    // Initialize
+    renderProducts();
+    updateCartUI();
+    setTimeout(animateStats, 500);
+
+    console.log('🛍️ Etornam\'s Collections loaded successfully!');
+    console.log(`📦 ${products.length} products available`);
+</script>
+</body>
+</html>
